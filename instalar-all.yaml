@@ -1,0 +1,10 @@
+
+
+
+---
+- hosts: dual
+  gather_facts: yes
+  become: yes
+  tasks:
+    - name: Incluir playbook
+      include: "playbooks-{{ ansible_os_family }}.yaml"
