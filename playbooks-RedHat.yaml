@@ -1,0 +1,54 @@
+---
+# tasks file for ins-apache-selinux
+    - name: Actualizar paquetes de software
+      dnf:
+        name: '*'
+        state: latest
+
+    - name: Instalar Apache y herramientas de Apache
+      dnf:
+        name:
+          - httpd
+          - httpd-tools
+        state: present
+
+    - name: Habilitar Apache al inicio
+      systemd:
+        name: httpd
+        enabled: yes
+
+    - name: Iniciar Apache
+      systemd:
+        name: httpd
+        state: started
+
+    - name: Permitir tráfico HTTP a través del firewall
+      command: 
+        cmd: sudo firewall-cmd --permanent --zone=public --add-service=http
+
+    - name: Permitir tráfico HTTPS a través del firewall
+      command: 
+        cmd: sudo firewall-cmd --permanent --zone=public --add-service=https
+
+    - name: Recargar firewall
+      command: 
+        cmd: sudo firewall-cmd --reload
+
+    - name: Deshabilitar módulo SELinux
+      template:
+          src: /home/vagrant/src/recursos/config
+          dest: /etc/selinux/config
+          owner: root
+          group: root
+          mode: '0644'
+
+    - name: Reiniciar servidor
+      reboot:
+          reboot_timeout: 60
+          post_reboot_delay: 30
+
+    - name: Iniciar httpd
+      systemd:
+        name: httpd
+        state: started
+...
